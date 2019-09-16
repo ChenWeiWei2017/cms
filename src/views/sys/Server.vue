@@ -1,5 +1,5 @@
 <template>
-  <div class="main-tab">服务器管理页面</div>
+  <div>服务器管理页面</div>
 </template>
 
 <script>

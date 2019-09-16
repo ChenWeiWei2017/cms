@@ -13,13 +13,27 @@ export default new Router({
     },
     {
       path: '/main',
-      /*name: 'main',*/
-      component: () => import('./views/Main.vue'),
+      components: {
+        default: () => import('./views/Main.vue')
+      },
       children: [
         {
           path: '',
-          redirect: '/main/home'
+          redirect: '/main/tabs'
         },
+        {
+          path: 'tabs',
+          components: {
+            home: () => import('./views/Home'),
+            sys_server: () => import('./views/sys/Server')
+          }
+        }
+      ]
+      /*children: [
+        // {
+        //   path: '',
+        //   redirect: '/main/home'
+        // },
         {path: 'sys', redirect: '/main/home'},
         {path: 'content', redirect: '/main/home'},
         {path: 'ctrl', redirect: '/main/home'},
@@ -35,7 +49,7 @@ export default new Router({
           name: 'sys_server',
           component: () => import('./views/sys/Server')
         }
-      ]
+      ]*/
     }
   ]
 })

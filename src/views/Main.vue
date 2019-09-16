@@ -57,9 +57,14 @@
                 :label="item.title"
                 :name="item.name"
                 :closable="item.closable">
+
+              <router-view class="tab-view" :name="item.name"></router-view>
             </el-tab-pane>
           </el-tabs>
-          <router-view></router-view>
+          <div style='position: absolute;right:10px;top:60px;'>
+            <span tabindex="0" class="el-tabs__new-tab"><i class="el-icon-plus"></i></span>
+            <span class="el-tabs__new-tab"><i class="el-icon-refresh-right"></i></span>
+          </div>
         </el-main>
         <el-footer class="main-footer">2019&copy;中国日报网</el-footer>
       </el-container>
@@ -80,11 +85,10 @@
         foldIcon: 'el-icon-s-fold',
         mainMenu: [],
         menuLeft: [],
-        editableTabsValue: '/main/home',
+        editableTabsValue: 'home',
         editableTabs: [{
           title: '主页',
-          name: '/main/home',
-          content: '主页内容',
+          name: 'home',
           closable: false
         }],
         tabIndex: 1
@@ -123,10 +127,9 @@
         this.menuLeft = this.mainMenu[index].subMenu;
       },
       handleLeftMenu(menu) {
-        console.log(menu);
         let tabs = this.editableTabs;
         const menuTab = tabs.filter(tab => tab.name === menu.index);
-        if (menuTab) {
+        if (menuTab.length) {
           this.editableTabsValue = menu.index;
         } else {
           this.editableTabs.push({
@@ -134,6 +137,7 @@
             name: menu.index,
             closable: true
           });
+          this.tabIndex++;
           this.editableTabsValue = menu.index;
         }
       },
@@ -153,16 +157,18 @@
         this.editableTabsValue = activeName;
         this.editableTabs = tabs.filter(tab => tab.name !== targetName);
         // 路由跳转至当前的Tab页
-        this.$router.replace({path: activeName});
+        // this.$router.replace({path: activeName});
       }
     },
     mounted() {
       const windowsHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
       const main = document.querySelector('#mainContainer');
       const elMain = document.querySelector('.el-main');
+      const tabsContent = document.querySelector('.tab-view');
       main.style.height = windowsHeight + 'px';
       document.querySelector('.el-footer.main-footer').style.height = '40px';
       elMain.style.height = windowsHeight - 100 + 'px';
+      tabsContent.style.height = windowsHeight - 141 + 'px';
     },
     created() {
       this.getMainMenu();
@@ -245,9 +251,9 @@
       padding 0
     .el-tabs__header
       margin 0
-    .main-tab
-      padding 15px 15px 0
-      height calc(100% - 56px)
+    .tab-view
+      /*padding 15px 15px 0
+      height calc(100% - 56px)*/
       overflow auto
 
   ::-webkit-scrollbar-track
