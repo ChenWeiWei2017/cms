@@ -57,13 +57,16 @@
                 :label="item.title"
                 :name="item.name"
                 :closable="item.closable">
-
-              <router-view class="tab-view" :name="item.name"></router-view>
+              <router-view v-if="item.alive" :class="'tab-view '+item.name" :name="item.name"></router-view>
             </el-tab-pane>
           </el-tabs>
-          <div style='position: absolute;right:10px;top:60px;'>
-            <span tabindex="0" class="el-tabs__new-tab"><i class="el-icon-plus"></i></span>
-            <span class="el-tabs__new-tab"><i class="el-icon-refresh-right"></i></span>
+          <div class="tab-btn">
+            <el-tooltip class="item" effect="dark" content="关闭其它页" placement="bottom-end">
+              <span class="el-tabs__new-tab" @click="closeOtherTab"><i class="el-icon-close"></i></span>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="刷新当前页" placement="bottom-end">
+              <span class="el-tabs__new-tab" @click="refreshCurrentTab"><i class="el-icon-refresh-right"></i></span>
+            </el-tooltip>
           </div>
         </el-main>
         <el-footer class="main-footer">2019&copy;中国日报网</el-footer>
@@ -89,8 +92,10 @@
         editableTabs: [{
           title: '主页',
           name: 'home',
+          alive: true,
           closable: false
         }],
+        homeTab: 'home',
         tabIndex: 1
       }
     },
@@ -135,6 +140,7 @@
           this.editableTabs.push({
             title: menu.title,
             name: menu.index,
+            alive: true,
             closable: true
           });
           this.tabIndex++;
@@ -158,13 +164,29 @@
         this.editableTabs = tabs.filter(tab => tab.name !== targetName);
         // 路由跳转至当前的Tab页
         // this.$router.replace({path: activeName});
+      },
+      refreshCurrentTab() {
+        let tabs = this.editableTabs;
+        let activeName = this.editableTabsValue;
+        // 查找当前tab
+        let search = tabs.filter(tab => tab.name === activeName);
+        if (search.length) {
+          let currTab = search[0];
+          currTab.alive = false;
+          this.$nextTick(() => (currTab.alive = true));
+        }
+      },
+      closeOtherTab() {
+        let tabs = this.editableTabs;
+        let activeName = this.editableTabsValue;
+        this.editableTabs = tabs.filter(tab => tab.name === this.homeTab || tab.name === activeName);
       }
     },
     mounted() {
       const windowsHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
       const main = document.querySelector('#mainContainer');
       const elMain = document.querySelector('.el-main');
-      const tabsContent = document.querySelector('.tab-view');
+      const tabsContent = document.querySelector('.el-tabs__content');
       main.style.height = windowsHeight + 'px';
       document.querySelector('.el-footer.main-footer').style.height = '40px';
       elMain.style.height = windowsHeight - 100 + 'px';
@@ -236,7 +258,7 @@
     line-height 40px
     font-size 14px
     text-align center
-    background-color #efefef
+    background-color #ffffff
     color #909399
   div:focus
     outline none
@@ -249,12 +271,41 @@
       vertical-align middle
   .el-main
       padding 0
+    .tab-btn
+      position absolute
+      right 10px
+      top 60px
     .el-tabs__header
       margin 0
-    .tab-view
-      /*padding 15px 15px 0
-      height calc(100% - 56px)*/
-      overflow auto
+      .el-tabs__nav-wrap
+        width calc(100% - 68px)
+    .el-tabs__new-tab
+      height 22px
+      width 22px
+      line-height 22px
+      font-size 16px
+      margin-left 5px
+      margin-top 9px
+      color #409eff
+      background #ecf5ff
+      border-color #b3d8ff
+    .el-tabs__new-tab:hover
+      background #409eff
+      border-color #409eff
+      color #fff
+    .el-tabs__new-tab:active
+      background #3a8ee6
+      border-color #3a8ee6
+      color #fff
+      outline none
+    .el-tabs__content
+      .el-tab-pane
+        height 100%
+        .tab-view
+          padding 10px
+          height calc(100% - 20px)
+          overflow auto
+          background-color #eee
 
   ::-webkit-scrollbar-track
     background-color transparent

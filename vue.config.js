@@ -21,14 +21,14 @@ module.exports = {
                     icon: ['fas', 'globe']
                   },
                   {
-                    index: 'sys_role',
-                    title: '角色管理',
-                    icon: ['fas', 'address-card']
-                  },
-                  {
                     index: 'sys_user',
                     title: '用户管理',
                     icon: ['fas', 'user']
+                  },
+                  {
+                    index: 'sys_role',
+                    title: '角色管理',
+                    icon: ['fas', 'address-card']
                   },
                   {
                     index: 'sys_department',

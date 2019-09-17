@@ -23,9 +23,13 @@ export default new Router({
         },
         {
           path: 'tabs',
+          meta: {
+            requireAuth: false
+          },
           components: {
             home: () => import('./views/Home'),
-            sys_server: () => import('./views/sys/Server')
+            sys_server: () => import('./views/sys/Server'),
+            sys_user: () => import('./views/sys/User')
           }
         }
       ]
