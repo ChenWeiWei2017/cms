@@ -219,10 +219,11 @@
           margin-top 6px
       .content-body
         padding 10px
-        height calc(100% - 125px)
+        height calc(100% - 126px)
       .content-footer
         padding 10px
         height 32px
+        border-top 1px solid #eee
     .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content
       background-color #66b1ff
       color #fff
