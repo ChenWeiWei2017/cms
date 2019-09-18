@@ -15,6 +15,16 @@
           </div>
         </div>
         <el-menu-item v-for="(item, index) in mainMenu" :index="item.index" :key="index">{{ item.module }}</el-menu-item>
+        <div class="site-box">
+          <el-select v-model="currentSite" placeholder="请选择站点" @change="changeSite">
+            <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
         <div class="user-box">
           <el-avatar class="avatar" icon="el-icon-user-solid"></el-avatar>
           <el-dropdown @command="handleCommand">
@@ -80,6 +90,22 @@
     name: "Main",
     data() {
       return {
+        options: [
+          {
+            value: '0',
+            label: '管理中心',
+            checked: true
+          },
+          {
+            value: '1',
+            label: '主站'
+          },
+          {
+            value: '2',
+            label: 'WND'
+          }
+        ],
+        currentSite: '0',
         activeIndex: '1',
         currentModuleIndex: '1',
         isCollapse: false,
@@ -100,22 +126,14 @@
       }
     },
     methods: {
+      changeSite(option) {
+        console.log(option)
+      },
       handleSelect(key) {
         let lastIndex = this.currentModuleIndex;
         if (lastIndex !== key) {
           this.currentModuleIndex = key;
           this.getLeftMenu(key - 1);
-        }
-      },
-      collapseMenu() {
-        if (this.isCollapse) {
-          this.isCollapse = false;
-          this.asideWidth = '200px';
-          this.foldIcon = 'el-icon-s-fold';
-        } else {
-          this.isCollapse = true;
-          this.asideWidth = '65px';
-          this.foldIcon = 'el-icon-s-unfold';
         }
       },
       handleCommand(command) {
@@ -124,7 +142,7 @@
       async getMainMenu() {
         const result = await this.$http.get('/api/user/v1/menus', {params: {userId: 1}});
         if (result.code === 200) {
-          this.mainMenu = result.data;
+          this.mainMenu = result.data.admin;
           this.getLeftMenu(0);
         }
       },
@@ -233,6 +251,12 @@
         position absolute
         left 200px
         color #fff
+      .site-box
+        height 60px
+        line-height 60px
+        position absolute
+        right 200px
+        width 130px
       .user-box
         height 60px
         position absolute
@@ -254,6 +278,7 @@
       border-right solid 1px #545c64
       height 100%
   .main-footer
+    box-shadow 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
     height 40px
     line-height 40px
     font-size 14px
