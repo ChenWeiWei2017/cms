@@ -38,6 +38,7 @@
           </div>
           <div class="content-footer">
             <el-pagination
+                background
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :current-page="currentPage"
@@ -177,13 +178,13 @@
             type: 'success',
             message: '你的查询条件是: ' + value
           });
-        });
+        }).catch(() => {});
       },
-      handleSizeChange() {
-
+      handleSizeChange(value) {
+        console.log('切换到一页' + value + '条')
       },
-      handleCurrentChange() {
-
+      handleCurrentChange(value) {
+        console.log('切换到' + value + '页');
       }
     }
   }

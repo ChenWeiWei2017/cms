@@ -16,7 +16,7 @@
         </div>
         <el-menu-item v-for="(item, index) in mainMenu" :index="item.index" :key="index">{{ item.module }}</el-menu-item>
         <div class="site-box">
-          <el-select v-model="currentSite" placeholder="请选择站点" @change="changeSite">
+          <el-select size="mini" v-model="currentSite" placeholder="请选择站点" @change="changeSite">
             <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -92,20 +92,20 @@
       return {
         options: [
           {
-            value: '0',
+            value: 'admin',
             label: '管理中心',
             checked: true
           },
           {
-            value: '1',
+            value: 'site1',
             label: '主站'
           },
           {
-            value: '2',
+            value: 'site2',
             label: 'WND'
           }
         ],
-        currentSite: '0',
+        currentSite: '',
         activeIndex: '1',
         currentModuleIndex: '1',
         isCollapse: false,
@@ -127,7 +127,7 @@
     },
     methods: {
       changeSite(option) {
-        console.log(option)
+        this.$router.push({name: 'tabs', params: {site: option}});
       },
       handleSelect(key) {
         let lastIndex = this.currentModuleIndex;
@@ -142,7 +142,11 @@
       async getMainMenu() {
         const result = await this.$http.get('/api/user/v1/menus', {params: {userId: 1}});
         if (result.code === 200) {
-          this.mainMenu = result.data.admin;
+          if (this.currentSite === 'admin') {
+            this.mainMenu = result.data.admin;
+          } else {
+            this.mainMenu = result.data.user;
+          }
           this.getLeftMenu(0);
         }
       },
@@ -198,6 +202,9 @@
         let tabs = this.editableTabs;
         let activeName = this.editableTabsValue;
         this.editableTabs = tabs.filter(tab => tab.name === this.homeTab || tab.name === activeName);
+      },
+      setCurrentSite() {
+        this.currentSite = this.$route.params.site;
       }
     },
     mounted() {
@@ -211,6 +218,7 @@
       tabsContent.style.height = windowsHeight - 141 + 'px';
     },
     created() {
+      this.setCurrentSite();
       this.getMainMenu();
     }
   }

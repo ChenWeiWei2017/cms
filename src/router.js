@@ -22,7 +22,9 @@ export default new Router({
           redirect: '/main/tabs'
         },
         {
-          path: 'tabs',
+          path: 'tabs/:site',
+          name: 'tabs',
+          props: true,
           meta: {
             requireAuth: false
           },
