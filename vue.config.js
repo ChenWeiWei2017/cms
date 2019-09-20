@@ -2,6 +2,25 @@ module.exports = {
   configureWebpack: {
     devServer: {
       before(app) {
+        app.get('/api/user/v1/sites', (req, res) => {
+          res.json({
+            code: 200,
+            data: [
+              {
+                value: 'admin',
+                label: '管理中心'
+              },
+              {
+                value: 'site1',
+                label: '主站'
+              },
+              {
+                value: 'site2',
+                label: 'WND'
+              }
+            ]
+          })
+        });
         app.get('/api/user/v1/menus', (req, res) => {
           res.json({
             code: 200,

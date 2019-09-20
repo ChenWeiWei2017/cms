@@ -58,6 +58,7 @@
       <el-container>
         <el-main>
           <el-tabs
+              class="menu-tabs"
               v-model="editableTabsValue"
               @tab-remove="removeTab"
               type="card">
@@ -90,21 +91,7 @@
     name: "Main",
     data() {
       return {
-        options: [
-          {
-            value: 'admin',
-            label: '管理中心',
-            checked: true
-          },
-          {
-            value: 'site1',
-            label: '主站'
-          },
-          {
-            value: 'site2',
-            label: 'WND'
-          }
-        ],
+        options: [],
         currentSite: '',
         activeIndex: '1',
         currentModuleIndex: '1',
@@ -138,6 +125,13 @@
       },
       handleCommand(command) {
         this.$message('click on item ' + command);
+      },
+      async setSites() {
+        const result = await this.$http.get('/api/user/v1/sites', {params: {userId: 1}});
+        if (result.code === 200) {
+          this.options = result.data;
+          this.setCurrentSite();
+        }
       },
       async getMainMenu() {
         const result = await this.$http.get('/api/user/v1/menus', {params: {userId: 1}});
@@ -204,7 +198,13 @@
         this.editableTabs = tabs.filter(tab => tab.name === this.homeTab || tab.name === activeName);
       },
       setCurrentSite() {
-        this.currentSite = this.$route.params.site;
+        let site = this.$route.params.site;
+        const find = this.options.filter((option => option.value === site)).length;
+        if (!find) {
+          this.$router.replace({name: 'tabs', params: {site: this.options[0].value}});
+        } else {
+          this.currentSite = site;
+        }
       }
     },
     mounted() {
@@ -218,7 +218,7 @@
       tabsContent.style.height = windowsHeight - 141 + 'px';
     },
     created() {
-      this.setCurrentSite();
+      this.setSites();
       this.getMainMenu();
     }
   }
@@ -308,37 +308,38 @@
       position absolute
       right 10px
       top 60px
-    .el-tabs__header
-      margin 0
-      .el-tabs__nav-wrap
-        width calc(100% - 68px)
-    .el-tabs__new-tab
-      height 22px
-      width 22px
-      line-height 22px
-      font-size 16px
-      margin-left 5px
-      margin-top 9px
-      color #409eff
-      background #ecf5ff
-      border-color #b3d8ff
-    .el-tabs__new-tab:hover
-      background #409eff
-      border-color #409eff
-      color #fff
-    .el-tabs__new-tab:active
-      background #3a8ee6
-      border-color #3a8ee6
-      color #fff
-      outline none
-    .el-tabs__content
-      .el-tab-pane
-        height 100%
-        .tab-view
-          padding 10px
-          height calc(100% - 20px)
-          overflow auto
-          background-color #eee
+    .el-tabs.menu-tabs
+      .el-tabs__header
+        margin 0
+        .el-tabs__nav-wrap
+          width calc(100% - 68px)
+      .el-tabs__new-tab
+        height 22px
+        width 22px
+        line-height 22px
+        font-size 16px
+        margin-left 5px
+        margin-top 9px
+        color #409eff
+        background #ecf5ff
+        border-color #b3d8ff
+      .el-tabs__new-tab:hover
+        background #409eff
+        border-color #409eff
+        color #fff
+      .el-tabs__new-tab:active
+        background #3a8ee6
+        border-color #3a8ee6
+        color #fff
+        outline none
+      .el-tabs__content
+        .el-tab-pane
+          height 100%
+          .tab-view
+            padding 10px
+            height calc(100% - 20px)
+            overflow auto
+            background-color #eee
 
   ::-webkit-scrollbar-track
     background-color transparent

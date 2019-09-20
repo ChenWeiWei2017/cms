@@ -31,7 +31,8 @@ export default new Router({
           components: {
             home: () => import('./views/Home'),
             sys_server: () => import('./views/sys/Server'),
-            sys_user: () => import('./views/sys/User')
+            sys_user: () => import('./views/sys/User'),
+            sys_role: () => import('./views/sys/Role'),
           }
         }
       ]
