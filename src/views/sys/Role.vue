@@ -19,7 +19,7 @@
                 @current-change="handleCurrentChange"
                 style="width: 100%">
               <el-table-column fixed property="id" label="ID" width="40px"></el-table-column>
-              <el-table-column property="name" label="角色名称" width="100px"></el-table-column>
+              <el-table-column property="title" label="角色名称" width="100px"></el-table-column>
               <el-table-column property="desc" label="角色描述"></el-table-column>
             </el-table>
           </div>
@@ -28,7 +28,7 @@
       <el-col :span="19">
         <div class="grid-content permission-box">
           <el-tabs v-model="activeName" class="role-tabs">
-            <el-tab-pane label="菜单权限" name="menu_permission">
+            <el-tab-pane v-loading="perTableLoading" label="菜单权限" name="menu_permission">
               <div class="menu-per-pane-header">
                 <el-button type="primary" @click="savePermissions" size="mini" icon="el-icon-check">保存权限</el-button>
               </div>
@@ -37,15 +37,16 @@
                     class="per-table"
                     ref="menuPermissionTable"
                     :data="menuPermissions"
+                    row-key="id"
                     border
                     @row-click="clickRow"
                     size="small"
                     :max-height="perTableHeight"
                     style="width: 100%">
-                  <el-table-column fixed type="selection" width="43"></el-table-column>
+                  <el-table-column fixed type="selection" :reserve-selection="true" width="43"></el-table-column>
                   <el-table-column property="id" label="ID" width="50"></el-table-column>
-                  <el-table-column property="name" label="权限名称" width="150"></el-table-column>
-                  <el-table-column property="info" label="菜单信息" width="300"></el-table-column>
+                  <el-table-column property="name" label="菜单名称" width="150"></el-table-column>
+                  <el-table-column property="module" label="所属模块" width="300"></el-table-column>
                   <el-table-column property="desc" label="菜单描述"></el-table-column>
                 </el-table>
               </div>
@@ -69,42 +70,72 @@
     data() {
       return {
         roles: [
-          {id: 1, name: '管理员', desc: '管理员'},
-          {id: 2, name: '一审编辑',desc: '一审编辑'},
-          {id: 3, name: '二审编辑', desc: '二审编辑'},
-          {id: 4, name: '责任编辑', desc: '责任编辑'},
+          {id: 1, title: '系统管理员', desc: '系统管理员'},
+          {id: 2, title: '管理员',desc: '管理员'},
+          {id: 3, title: '编辑', desc: '普通编辑'},
+          {id: 4, title: '责任编辑', desc: '责任编辑'},
         ],
         currentRow: '',
         roleTableHeight: '',
         perTableHeight: '',
+        perTableLoading: true,
         activeName: 'menu_permission',
         menuPermissions: [
-          {id: 1, name: '服务器管理', info: '系统管理 > 服务器管理', desc: '维护服务器信息'},
-          {id: 2, name: '站点管理', info: '系统管理 > 站点管理', desc: '维护站点信息，可以新增和删除站点'},
-          {id: 3, name: '用户管理', info: '系统管理 > 用户管理', desc: '维护用户信息，可以新增和删除、修改用户账号信息'},
-          {id: 4, name: '角色管理', info: '系统管理 > 角色管理', desc: '维护角色信息，可以新增角色、给角色授权，查看拥有该角色的用户'},
+          {id: 1, name: '服务器管理', module: '系统管理', desc: '维护服务器信息', checked: 0},
+          {id: 2, name: '站点管理', module: '系统管理', desc: '维护站点信息，可以新增和删除站点', checked: 0},
+          {id: 3, name: '用户管理', module: '系统管理', desc: '维护用户信息，可以新增和删除、修改用户账号信息', checked: 0},
+          {id: 4, name: '角色管理', module: '系统管理', desc: '维护角色信息，可以新增角色、给角色授权，查看拥有该角色的用户', checked: 0},
+          {id: 5, name: '部门管理', module: '系统管理', desc: '维护部门信息', checked: 0},
+          {id: 6, name: '网站结构管理', module: '系统管理', desc: '维护网站结构信息', checked: 0},
+          {id: 7, name: '系统日志管理', module: '系统管理', desc: '维护系统日志信息', checked: 0},
         ],
         operationPermissions: []
       }
     },
     methods: {
       handleCurrentChange(val) {
+        // 当左侧角色被选中时，加载右侧权限信息
         this.currentRow = val;
+        this.setRolePermissions(this.currentRow.id);
       },
       clickRow(row) {
         this.$refs.menuPermissionTable.toggleRowSelection(row);
       },
       savePermissions() {
+        console.log('currentRoleId = ' + this.currentRow.id);
+        let selectionIdArray = [];
         let selections = this.$refs.menuPermissionTable.selection;
         selections.forEach(selection => {
-          console.log(selection.id);
+          selectionIdArray.push(selection.id);
         });
+        console.log(selectionIdArray);
+      },
+      async setRolePermissions(roleId) {
+        this.perTableLoading = true;
+        // 根据roleId从后端查询授权信息
+        const result = await this.$http.get('/api/user/v1/role_permissions', {params:{roleId:roleId}});
+        let menuArray = this.menuPermissions;
+        let rolePermissions = result.data;
+        this.$refs.menuPermissionTable.clearSelection();
+        rolePermissions.forEach(permissionId => {
+          for (let i = 0; i < menuArray.length; i++) {
+            if (permissionId === menuArray[i].id) {
+              this.$refs.menuPermissionTable.toggleRowSelection(menuArray[i], true);
+              break;
+            }
+          }
+        });
+        this.perTableLoading = false;
       }
     },
     created() {
       const windowsHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
       this.perTableHeight = windowsHeight - 269;
       this.roleTableHeight = windowsHeight - 209;
+    },
+    mounted() {
+      // 默认选中第一行
+      this.$refs.roleTable.setCurrentRow(this.roles[0]);
     }
   }
 </script>

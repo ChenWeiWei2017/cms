@@ -33,6 +33,8 @@ export default new Router({
             sys_server: () => import('./views/sys/Server'),
             sys_user: () => import('./views/sys/User'),
             sys_role: () => import('./views/sys/Role'),
+            sys_node: () => import('./views/sys/Node'),
+            ctrl_node: () => import('./views/ctrl/Node'),
           }
         }
       ]

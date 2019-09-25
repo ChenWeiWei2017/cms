@@ -13,6 +13,10 @@ export default function setAxios() {
         config.headers.token = store.state.token;
       }
       return config;
+    },error => {
+      // Do Something with request error
+      console.log(error);
+      Promise.reject(error);
     }
   );
 

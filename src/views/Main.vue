@@ -50,7 +50,7 @@
             text-color="#fff"
             active-text-color="#ffd04b">
           <el-menu-item v-for="(menu) in menuLeft" :key="menu.index" :index="menu.index" @click="handleLeftMenu(menu)">
-            <font-awesome-icon :icon="menu.icon"></font-awesome-icon>
+            <font-awesome-icon :icon="menu.icon.split('|')"></font-awesome-icon>
             <span slot="title">{{ menu.title }}</span>
           </el-menu-item>
         </el-menu>
